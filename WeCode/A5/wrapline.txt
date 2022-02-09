@@ -1,0 +1,62 @@
+s = input()
+n = int(input())
+# Xoa Khoan cach o dau hang
+c = 0
+for i in range(len(s)):
+    if s[i] == " ":
+        c += 1
+    else:
+        break
+s = s[c :]
+
+ss = ""
+strings = []
+for i in range(0,len(s)):
+	if s[i] != " ":
+		ss += s[i]
+		if(i == len(s) - 1):
+			strings.append(ss)
+	else:
+		if(len(ss) > 0):
+			strings.append(ss)
+			ss = ""
+		strings.append(" ")
+
+m = len(strings)
+st = ""
+i = 0
+while (i < m):
+    #print(i, strings[i], st)
+    if (len(strings[i]) > n):
+        if (st != ""):
+            print(st)
+        st = ""
+        j = i + 1
+        ss = strings[i]
+        while j < m:
+            if (strings[j] == " "):
+                ss += strings[j]
+                j += 1
+            else:
+                break
+        print(ss)
+        i = j - 1
+    elif (len(strings[i]) == n):
+        if (st != ""):
+            print(st)
+        print(strings[i])
+        st = ""
+    else:
+        #print("st:", st)
+        if (len(st + strings[i]) < n):
+            st += strings[i]
+        elif (len(st + strings[i]) == n):
+            print(st + strings[i])
+            st =""
+        else:
+            print(st)
+            st = strings[i]
+        if (i == m - 1):
+            if (st != ""):
+                print(st)
+    i += 1

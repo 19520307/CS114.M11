@@ -1,0 +1,158 @@
+q = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+D = dict({'v': [1, 0],
+         '^': [-1, 0],
+         '<': [0, -1],
+         '>': [0, 1]})
+DIRECTION = {'v': {'L': '>', 'R': '<'}, 
+             '^': {'L': '<', 'R': '>'},                 
+             '<': {'L': 'v', 'R': '^'}, 
+             '>': {'L': '^', 'R': 'v'}}
+
+def _Isinmap(x, y, n, m):
+    return ((x < 0) or (x >= n) or (y < 0) or (y >= m))
+def findSnake(Point, Snake, n, m,Sympol):
+    Body = []
+    Body.append(Snake[0])
+    Bool = []
+    kt = 1 
+    
+    for i in range(n):
+        tmp = []
+        for j in range(m):
+            tmp.append(True)
+        Bool.append(tmp)
+    while (len(Snake) >  0):
+        x, y = Snake.pop()
+        Bool[x][y] = False
+        for i in range(4):
+            ux, uy = q[i]
+            """if (kt == 1):
+                u, v = D[Sympol]
+                if (ux, uy) == (u, v):
+                    #print(1)
+                    continue"""
+            vx = x + ux
+            vy = y + uy
+            if (_Isinmap(vx, vy, n, m) == False):
+                if (Bool[vx][vy]):
+                    if (Point[vx][vy] == '*'):
+                        Snake.append((vx, vy))
+                        Bool[vx][vy] = False
+                        Body.append((vx, vy))
+                        kt += 1
+                        #print(vx, vy)
+                        break
+
+    return Body
+
+def updateMap(s, Sympol, n, m):
+    P = []
+    x, y = s[0]
+    #print(x, y)
+    if (Sympol != 'X'):
+        for i in range(n):
+            tmp = ""
+            for j in range(m):
+                x, y = s[0]
+                if ((i, j) == (x, y)):
+                    #print(x, y)
+                    tmp = tmp + Sympol
+                elif ((i, j) in s):
+                    tmp = tmp + '*'
+                else:
+                    tmp = tmp + '.'
+            P.append(tmp)
+    else:
+        for i in range(n):
+            tmp = ""
+            for j in range(m):
+                if ((i, j) in s):
+                    tmp = tmp + Sympol
+                else:
+                    tmp = tmp + '.'
+            P.append(tmp)
+
+    return P
+def _alive(vx,vy,Snake):
+    for i in range(len(Snake) - 1):
+        x, y = Snake[i]
+        if ((x, y) == (vx, vy)):
+            return False
+
+    return True
+
+def process(Point, Snake, Sympol, n, m):
+    headx, heady = Snake[0]
+    ux, uy = D[Sympol]
+    kt = False
+    vx = headx + ux
+    vy = heady + uy
+    #print(Snake)
+    if (_Isinmap(vx, vy, n , m) == False):
+        #print(vx, vy)
+        if (_alive(vx, vy, Snake)):
+            #print(1)
+            Snake.insert(0, (vx,vy))
+            Snake.pop(len(Snake) - 1)
+            kt = True
+    #print(Snake)
+    if (kt):
+        Point = updateMap(Snake, Sympol, n, m)
+    else:
+        Point = updateMap(Snake, 'X', n, m)
+
+    """print("###")
+    for i in range(n):
+        for j in range(m):
+            print(Point[i][j], end = '')
+        print()
+
+    print("###")"""
+    return Point, Snake, kt
+
+
+
+
+n, m, c = map(int,input().split())
+point = []
+for i in range(n):
+    tmp = input()
+    point.append(tmp)
+
+direct = input()
+m = len(point[0])
+kt = False
+snake = []
+for i in range(n):
+    for j in range(m):
+        if (point[i][j] in ['<', '>', '^', 'v']):
+            #print(i,j)
+            snake.append((i, j))
+            kt = True
+            break
+    if (kt):
+        break
+    
+x, y = snake[0]
+sympol = point[x][y]
+snake = findSnake(point, snake, n, m, sympol) # thu tu cua ran
+
+#print(snake)
+#print(snake[0])
+#print(snake)
+#print(direct)
+#print(sympol)
+for i in range(len(direct)):
+    #print(direct[i])
+    if ((direct[i] == 'R') or (direct[i] == 'L')):
+        sympol = DIRECTION[sympol][direct[i]]
+        #print(sympol)
+    else:
+        point, snake, kt = process(point,snake,sympol,n,m)
+        if (kt == False): 
+            break
+
+for i in range(n):
+    for j in range(m):
+        print(point[i][j], end = '')
+    print()
